@@ -75,7 +75,7 @@ while True:
         frame_cnt = 0
 
     image = np.zeros((480, 640, 3), dtype=np.uint8)
-    fuck = Triangle.interpolate(me, society, frame_cnt / 100)
+    fuck = Triangle.interpolate(me, society, (frame_cnt - 100) / 10)
     
     for j in [140, 240, 340]:
         for i in [120, 220, 320, 420, 520]:

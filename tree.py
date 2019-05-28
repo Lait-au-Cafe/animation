@@ -201,7 +201,7 @@ biotree.extend([
 frame_cnt = 0
 selected_points = None
 
-window_name = "Test"
+window_name = "Tree"
 cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 def on_mouse_event(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
