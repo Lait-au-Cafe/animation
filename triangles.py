@@ -1,5 +1,6 @@
 import dataclasses
 import typing
+from datetime import datetime, timedelta
 
 import cv2
 import numpy as np
@@ -62,17 +63,36 @@ frame_cnt = 0
 window_name = "Triangle"
 cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter(
+    f"aligned_triangle.avi", 
+    fourcc, 30, (640, 480), True)
+
+delta_time = timedelta()
+prev_time = datetime.now()
+fps = 30
+frame_period = timedelta(milliseconds = 1000 / fps)
+
 while True:
     key = cv2.waitKey(10)
     if key == 27:
         break
     
-    if key == ord('b'):
-        frame_cnt -= 1
-    elif key == ord('p'):
-        frame_cnt += 1
-    elif key == ord('r'):
-        frame_cnt = 0
+#    if key == ord('b'):
+#        frame_cnt -= 1
+#    elif key == ord('p'):
+#        frame_cnt += 1
+#    elif key == ord('r'):
+#        frame_cnt = 0
+
+    cur_time = datetime.now()
+    delta_time += (cur_time -  prev_time)
+    prev_time = cur_time
+
+    while delta_time > frame_period:
+        delta_time -= frame_period
+        frame_cnt = min(frame_cnt + 1, 1100)
+        out.write(image)
 
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     fuck = Triangle.interpolate(me, society, (frame_cnt - 100) / 10)
@@ -84,7 +104,9 @@ while True:
             else:
                 society.draw(image, np.array([i, j]))
 
-    cv2.putText(image, 
-        f"{frame_cnt}", 
-        (0, 470), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+#    cv2.putText(image, 
+#        f"{frame_cnt}", 
+#        (0, 470), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
     cv2.imshow(window_name, image)
+
+out.release()

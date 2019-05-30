@@ -1,5 +1,6 @@
 import math
 import dataclasses
+from datetime import datetime, timedelta
 
 import cv2
 import numpy as np
@@ -211,17 +212,36 @@ def on_mouse_event(event, x, y, flags, param):
 
 cv2.setMouseCallback(window_name, on_mouse_event)
 
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter(
+    f"bionic_tree.avi", 
+    fourcc, 30, (640, 480), True)
+
+delta_time = timedelta()
+prev_time = datetime.now()
+fps = 30
+frame_period = timedelta(milliseconds = 1000 / fps)
+
 while True:
     key = cv2.waitKey(10)
     if key == 27:
         break
     
-    if key == ord('b'):
-        frame_cnt -= 1
-    elif key == ord('p'):
-        frame_cnt += 1
-    elif key == ord('r'):
-        frame_cnt = 0
+#    if key == ord('b'):
+#        frame_cnt -= 1
+#    elif key == ord('p'):
+#        frame_cnt += 1
+#    elif key == ord('r'):
+#        frame_cnt = 0
+    
+    cur_time = datetime.now()
+    delta_time += (cur_time -  prev_time)
+    prev_time = cur_time
+
+    while delta_time > frame_period:
+        delta_time -= frame_period
+        frame_cnt = min(frame_cnt + 1, 1100)
+        out.write(image)
 
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     
@@ -234,7 +254,9 @@ while True:
                 tuple((branch.origin + (branch.scale * length) * branch.direction).astype(np.int32)), 
                 (255, 255, 255), 3)
 
-    cv2.putText(image, 
-        f"{frame_cnt}: {selected_points}", 
-        (0, 470), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+#    cv2.putText(image, 
+#        f"{frame_cnt}: {selected_points}", 
+#        (0, 470), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
     cv2.imshow(window_name, image)
+
+out.release()
